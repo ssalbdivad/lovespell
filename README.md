@@ -1,2 +1,3 @@
 # lovespell
-Lovable games for word lovers
+
+Loveable games for word lovers (hosted at [lovespell.games](https://lovespell.games))

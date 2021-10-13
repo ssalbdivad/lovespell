@@ -1,0 +1,32 @@
+{
+    "name": "lovespell",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "@material-ui/core": "5.0.0-beta.3",
+        "@material-ui/icons": "5.0.0-beta.1",
+        "@material-ui/styles": "5.0.0-beta.3",
+        "react": "17.0.2",
+        "react-dom": "17.0.2",
+        "@re-do/components": "0.1.2",
+        "@re-do/utils": "1.0.0",
+        "react-statelessly": "0.1.0",
+        "react-lineto": "3.2.1"
+    },
+    "devDependencies": {
+        "@re-do/configs": "0.1.0",
+        "@re-do/node-utils": "0.1.1",
+        "@types/node": "16.10.1",
+        "@types/react": "17.0.24",
+        "@types/react-dom": "17.0.9",
+        "vite": "2.4.4",
+        "jsrx": "0.1.0",
+        "ts-node": "10.2.1",
+        "typescript": "4.4.3"
+    },
+    "scripts": {
+        "start": "jsrx start",
+        "build": "jsrx build",
+        "jsrxGen": "jsrx jsrxGen"
+    }
+}
