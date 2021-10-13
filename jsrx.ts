@@ -1,7 +1,8 @@
-import { jsrx, $, shell } from "jsrx"
+import { jsrx, shell } from "jsrx"
 import { createServer, build, UserConfig } from "vite"
 import { getWebConfig } from "@re-do/configs"
 import { fromHere } from "@re-do/node-utils"
+import { join } from "path"
 
 const pkgRoot = fromHere("src")
 
@@ -16,7 +17,7 @@ const getWebsiteConfig = ({ watch = false }: GetConfigArgs = {}) =>
         watch,
         options: {
             build: {
-                minify: false,
+                sourcemap: false,
             },
             server: {
                 port: Number(process.env.VITE_DEV_SERVER_PORT),

@@ -51,7 +51,8 @@ export type WordsTrie = {
 
 export const buildWordsTrie = (): WordsTrie => {
     // @ts-ignore
-    const dictionary = import("../dictionary.json")
+    // const dictionary = import("./dictionary.json")
+    const dictionary = {}
     const wordList = Object.keys(dictionary)
     const root = {}
     const addSuffixToTrie = (trie: WordsTrie, suffix: string) => {
