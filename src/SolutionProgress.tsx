@@ -1,9 +1,47 @@
-import React from "react"
+import React, { useState } from "react"
 import { store } from "./state"
 import CircularProgress from "@material-ui/core/CircularProgress"
 import LinearProgress from "@material-ui/core/LinearProgress"
 import { Column, Row, Text } from "@re-do/components"
 import { getScore } from "./dictionary.js"
+
+import { Icons } from "@re-do/components"
+import Accordion, { AccordionProps } from "@material-ui/core/Accordion"
+import AccordionSummary from "@material-ui/core/AccordionSummary"
+import AccordionDetails from "@material-ui/core/AccordionDetails"
+
+type StepProps = Partial<AccordionProps> & {
+    summary: string
+    children: JSX.Element | JSX.Element[]
+}
+
+const Expandable = ({
+    summary,
+    children,
+    defaultExpanded,
+    ...rest
+}: StepProps) => {
+    const [expanded, setExpanded] = useState(!!defaultExpanded)
+    return (
+        <Accordion
+            key={summary}
+            style={{
+                background: "transparent",
+            }}
+            elevation={0}
+            onChange={(_, open) => setExpanded(open)}
+            defaultExpanded={defaultExpanded ?? false}
+            {...rest}
+        >
+            <AccordionSummary expandIcon={<Icons.expandDown />}>
+                <Row align="center">
+                    <Text variant="h6">{summary}</Text>
+                </Row>
+            </AccordionSummary>
+            <AccordionDetails>{children}</AccordionDetails>
+        </Accordion>
+    )
+}
 
 export type SolutionProgressProps = {}
 
@@ -66,11 +104,12 @@ export const SolutionProgress = ({}: SolutionProgressProps) => {
         },
         {} as WordsByMetric
     )
-    const progressColumns: JSX.Element[][] = [[], []]
+    const [windowWidth] = useState(window.innerWidth)
+    const progressByLength: JSX.Element[] = []
     Object.entries(solutionsByLength).forEach(([length, solutions], index) => {
         const foundOfLength = foundByLength[length] ?? []
-        progressColumns[index % 2].push(
-            <Column key={length} style={{ minHeight: 104 }}>
+        progressByLength.push(
+            <Column key={length} style={{ minHeight: 104, maxWidth: 270 }}>
                 <Row align="center" justify="center" position="relative">
                     <Text variant="h6" style={{ width: 80 }}>
                         {length}-letter
@@ -108,7 +147,7 @@ export const SolutionProgress = ({}: SolutionProgressProps) => {
                     variant="determinate"
                     style={{ width: "100%" }}
                 />
-                <Text style={{ minWidth: 80, paddingLeft: 8 }}>
+                <Text style={{ minWidth: 100, paddingLeft: 8 }}>
                     of {maxScore}
                 </Text>
             </Row>
@@ -126,9 +165,15 @@ export const SolutionProgress = ({}: SolutionProgressProps) => {
                     points🤖)
                 </Text>
             </Row>
-            <Row>
-                <Column>{...progressColumns[0]}</Column>
-                <Column>{...progressColumns[1]}</Column>
+            <Row style={{ padding: 8 }}>
+                {windowWidth >= 800 ? (
+                    <Row wrap="wrap">{...progressByLength}</Row>
+                ) : (
+                    <Expandable
+                        summary="Progress stats"
+                        children={<Row wrap="wrap">{...progressByLength}</Row>}
+                    />
+                )}
             </Row>
         </Column>
     )

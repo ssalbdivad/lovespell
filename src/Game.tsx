@@ -12,7 +12,7 @@ export type GameProps = {}
 
 export const Game = ({}: GameProps) => {
     return (
-        <Column>
+        <Column justify="center" align="center">
             <LetterGrid />
             <Row justify="center">
                 <Button
@@ -47,8 +47,12 @@ export const Game = ({}: GameProps) => {
                 />
             </Row>
             <WordInput />
-            <Row justify="center" spacing={8}>
-                <Column>
+            {/* 
+            If we don't specify overflow hidden, the sliders unnecessarily overflow:
+            https://github.com/mui-org/material-ui/issues/13455
+             */}
+            <Row justify="center" style={{ overflow: "hidden", padding: 16 }}>
+                <Column style={{ paddingRight: 16 }}>
                     <Text>Rows</Text>
                     <Slider
                         defaultValue={3}
@@ -62,7 +66,7 @@ export const Game = ({}: GameProps) => {
                         }}
                     />
                 </Column>
-                <Column>
+                <Column style={{ paddingLeft: 16 }}>
                     <Text>Columns</Text>
                     <Slider
                         defaultValue={3}

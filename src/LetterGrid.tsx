@@ -13,19 +13,25 @@ export const LetterGrid = ({}: LetterGridProps) => {
     if (isEmpty(analysis.grid)) {
         store.update({ analysis: [generateLetterGrid({ rows, columns })] })
     }
+    console.log("")
     return (
-        <Column>
+        <Column
+            style={{
+                height: `min(60vh, ${rows * 80}px)`,
+                width: `min(60vh, ${columns * 80}px)`,
+            }}
+        >
             {analysis.grid?.map((row, rowIndex) => (
                 <Row key={rowIndex} justify="center">
                     {row.map((letter, columnIndex) => (
-                        <Row
-                            key={columnIndex}
-                            justify="center"
-                            style={{ height: 100, width: 100 }}
-                        >
+                        <Row key={columnIndex} justify="center">
                             <Text
                                 className={`${rowIndex},${columnIndex}`}
-                                style={{ fontSize: 50 }}
+                                style={{
+                                    fontSize: `min(${
+                                        60 / Math.max(rows, columns)
+                                    }vh, 50px)`,
+                                }}
                             >
                                 {letter}
                             </Text>

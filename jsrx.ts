@@ -13,7 +13,7 @@ type GetConfigArgs = {
 const getWebsiteConfig = ({ watch = false }: GetConfigArgs = {}) =>
     getWebConfig({
         srcDir: pkgRoot,
-        outDir: fromHere("dist"),
+        outDir: fromHere("docs"),
         watch,
         options: {
             build: {
