@@ -25,28 +25,30 @@ export const LetterGrid = ({}: LetterGridProps) => {
         >
             {analysis.grid?.map((row, rowIndex) => (
                 <Row key={rowIndex} justify="center">
-                    {row.map((letter, columnIndex) => (
-                        <Row
-                            key={columnIndex}
-                            justify="center"
-                            onClick={() => {
-                                store.update({
-                                    input: (current) => `${current}${letter}`,
-                                })
-                            }}
-                        >
-                            <Text
-                                className={`${rowIndex},${columnIndex}`}
-                                style={{
-                                    fontSize: `min(${
-                                        60 / Math.max(rows, columns)
-                                    }vh, 50px)`,
-                                }}
+                    {row.map((letter, columnIndex) => {
+                        const addLetterToInput = () =>
+                            store.update({
+                                input: (current) => `${current}${letter}`,
+                            })
+                        return (
+                            <Row
+                                key={columnIndex}
+                                justify="center"
+                                onClick={addLetterToInput}
                             >
-                                {letter}
-                            </Text>
-                        </Row>
-                    ))}
+                                <Text
+                                    className={`${rowIndex},${columnIndex}`}
+                                    style={{
+                                        fontSize: `min(${
+                                            60 / Math.max(rows, columns)
+                                        }vh, 50px)`,
+                                    }}
+                                >
+                                    {letter}
+                                </Text>
+                            </Row>
+                        )
+                    })}
                 </Row>
             ))}
             {segments

@@ -124,9 +124,11 @@ export const WordInput = () => {
             <Row justify="center">
                 {isMobile ? (
                     <>
-                        <TextInput style={{ flexGrow: 1 }} kind="underlined">
-                            {input}
-                        </TextInput>
+                        <TextInput
+                            style={{ flexGrow: 1 }}
+                            value={input}
+                            kind="underlined"
+                        />
                         <Button
                             Icon={BackIcon}
                             style={{ marginRight: 8 }}
