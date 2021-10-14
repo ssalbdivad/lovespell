@@ -122,19 +122,34 @@ export const WordInput = () => {
     return (
         <Column align="center">
             <Row justify="center">
+                <TextInput
+                    value={input}
+                    onChange={({ target }) => {
+                        store.update({ input: target.value, errors: "" })
+                    }}
+                    kind="underlined"
+                    onKeyPress={({ key }) => {
+                        if (key === "Enter") {
+                            store.$.submitInput(input)
+                        }
+                    }}
+                />
+                <Text
+                    style={{
+                        color: segmentColors[segmentColors.length - 1],
+                    }}
+                >
+                    +{inputScore}
+                </Text>
                 {isMobile ? (
                     <>
-                        <TextInput
-                            style={{ flexGrow: 1 }}
-                            value={input}
-                            kind="underlined"
-                        />
                         <Button
                             Icon={BackIcon}
                             style={{ marginRight: 8 }}
                             onClick={() =>
                                 store.update({
-                                    input: input.slice(-1),
+                                    input: input.slice(0, -1),
+                                    errors: "",
                                 })
                             }
                         />
@@ -144,6 +159,7 @@ export const WordInput = () => {
                             onClick={() =>
                                 store.update({
                                     input: "",
+                                    errors: "",
                                 })
                             }
                         />
@@ -154,28 +170,7 @@ export const WordInput = () => {
                             onClick={() => store.$.submitInput()}
                         />
                     </>
-                ) : (
-                    <>
-                        <TextInput
-                            value={input}
-                            onChange={({ target }) => {
-                                store.update({ input: target.value })
-                            }}
-                            onKeyPress={({ key }) => {
-                                if (key === "Enter") {
-                                    store.$.submitInput(input)
-                                }
-                            }}
-                        />
-                        <Text
-                            style={{
-                                color: segmentColors[segmentColors.length - 1],
-                            }}
-                        >
-                            +{inputScore}
-                        </Text>
-                    </>
-                )}
+                ) : null}
             </Row>
             {error ? <ErrorText>{error}</ErrorText> : null}
         </Column>
