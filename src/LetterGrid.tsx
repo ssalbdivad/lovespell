@@ -1,19 +1,21 @@
 import React from "react"
 import { Row, Column, Text } from "@re-do/components"
 import { generateLetterGrid } from "./generateLetterGrid"
-import { store } from "./state"
-import { isEmpty } from "@re-do/utils"
+import { isMobile, store } from "./state"
+import { isEmpty, transform } from "@re-do/utils"
+import LineTo from "react-lineto"
 
 export type LetterGridProps = {}
 
 export const LetterGrid = ({}: LetterGridProps) => {
     // @ts-ignore
     const [analysis] = store.useGet("analysis")
+    // @ts-ignore
+    const [segments] = store.useGet("segments")
     const { rows, columns } = store.useQuery({ rows: true, columns: true })
     if (isEmpty(analysis.grid)) {
         store.update({ analysis: [generateLetterGrid({ rows, columns })] })
     }
-    console.log("")
     return (
         <Column
             style={{
@@ -24,7 +26,15 @@ export const LetterGrid = ({}: LetterGridProps) => {
             {analysis.grid?.map((row, rowIndex) => (
                 <Row key={rowIndex} justify="center">
                     {row.map((letter, columnIndex) => (
-                        <Row key={columnIndex} justify="center">
+                        <Row
+                            key={columnIndex}
+                            justify="center"
+                            onClick={() => {
+                                store.update({
+                                    input: (current) => `${current}${letter}`,
+                                })
+                            }}
+                        >
                             <Text
                                 className={`${rowIndex},${columnIndex}`}
                                 style={{
@@ -39,6 +49,22 @@ export const LetterGrid = ({}: LetterGridProps) => {
                     ))}
                 </Row>
             ))}
+            {segments
+                ? transform(
+                      segments,
+                      ([segmentName, color], index) => [
+                          index,
+                          <LineTo
+                              key={index}
+                              from={segmentName.split(":")[0]}
+                              to={segmentName.split(":")[1]}
+                              borderWidth={5}
+                              borderColor={color}
+                          />,
+                      ],
+                      { asValueArray: true }
+                  )
+                : null}
         </Column>
     )
 }

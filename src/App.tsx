@@ -1,10 +1,11 @@
 import React from "react"
 import { AppContents, Column, Row, Text, DefaultTheme } from "@re-do/components"
 import { StatelessProvider } from "react-statelessly"
-import { store } from "./state"
+import { isMobile, store } from "./state"
 import { SolutionProgress } from "./SolutionProgress.js"
 import { Game } from "./Game.js"
 import { CssBaseline } from "@material-ui/core"
+import { Actions } from "./Actions.js"
 
 export const App = () => (
     <StatelessProvider store={store}>
@@ -17,7 +18,6 @@ export const App = () => (
                 style={{ padding: 16 }}
             >
                 <Row
-                    align="center"
                     justify="center"
                     wrap="wrap"
                     style={{ maxHeight: "100%", maxWidth: 1200 }}
@@ -30,12 +30,14 @@ export const App = () => (
                         style={{ maxWidth: 600 }}
                     >
                         <Text style={{ fontSize: "clamp(1rem, 12vw , 3rem)" }}>
-                            Lovespell 💖🪄
+                            Lovespell 💖
                         </Text>
                         <Game />
+                        {isMobile ? null : <Actions />}
                     </Column>
                     <Column style={{ maxWidth: 600 }} overflow="auto">
                         <SolutionProgress />
+                        {isMobile ? <Actions /> : null}
                     </Column>
                 </Row>
             </Column>

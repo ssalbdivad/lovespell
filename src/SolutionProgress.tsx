@@ -140,37 +140,36 @@ export const SolutionProgress = ({}: SolutionProgressProps) => {
     })
     return (
         <Column align="center">
-            <Text variant="h4">Score: {score}</Text>
             <Row height={40} align="baseline">
                 <LinearProgress
                     value={(score / maxScore) * 100}
                     variant="determinate"
                     style={{ width: "100%" }}
                 />
-                <Text style={{ minWidth: 100, paddingLeft: 8 }}>
-                    of {maxScore}
+                <Text variant="h6" style={{ minWidth: 150, paddingLeft: 8 }}>
+                    {score} of {maxScore}
                 </Text>
             </Row>
             <Row height={40} align="baseline" justify="space-around">
+                <Text>Best word: {bestWord}</Text>
+                <Text>Best possible: {revealed ? maxWord : "???"}</Text>
+            </Row>
+            <Row justify="space-around">
                 <Text>
-                    Best word:
-                    {` ${bestWord} (${bestWordScore} points${
+                    {`(${bestWordScore} points${
                         bestWordProgressToEmoji[
                             Math.floor((bestWordScore / maxWordScore) * 10)
                         ]
                     })`}
                 </Text>
-                <Text>
-                    Best possible: {revealed ? maxWord : "???"} ({maxWordScore}{" "}
-                    points🤖)
-                </Text>
+                <Text>({maxWordScore} points🤖)</Text>
             </Row>
             <Row style={{ padding: 8 }}>
                 {windowWidth >= 800 ? (
                     <Row wrap="wrap">{...progressByLength}</Row>
                 ) : (
                     <Expandable
-                        summary="Progress stats"
+                        summary="Words"
                         children={<Row wrap="wrap">{...progressByLength}</Row>}
                     />
                 )}

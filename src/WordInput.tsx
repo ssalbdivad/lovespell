@@ -1,16 +1,24 @@
 import React, { useState } from "react"
-import { Row, Column, Text, TextInput, ErrorText } from "@re-do/components"
+import {
+    Row,
+    Column,
+    Text,
+    TextInput,
+    ErrorText,
+    Button,
+} from "@re-do/components"
 import { isWord, getScore } from "./dictionary.js"
 import {
     LetterPosition,
     randomInRange,
     LetterAnalysis,
 } from "./generateLetterGrid.js"
-import { Segments, store } from "./state"
-import LineTo from "react-lineto"
-import { transform } from "@re-do/utils"
+import { isMobile, Segments, store } from "./state"
+import BackIcon from "@material-ui/icons/KeyboardBackspace"
+import EnterIcon from "@material-ui/icons/Check"
+import ClearIcon from "@material-ui/icons/Clear"
 
-const getValidPaths = (
+export const getValidPaths = (
     input: string,
     { positions: letterMap, adjacencies: adjacencyMap }: LetterAnalysis
 ) => {
@@ -104,104 +112,70 @@ export const getSegments = (
 const errorRed = "rgb(255, 0, 0)"
 
 export const WordInput = () => {
-    const { wordsFound } = store.useQuery({
-        wordsFound: true,
+    const { input, error } = store.useQuery({
+        input: true,
+        error: true,
     })
-    // @ts-ignore
-    const [segments] = store.useGet("segments")
-    const [analysis] = store.useGet("analysis")
-    const [state, setState] = useState({
-        error: "",
-        input: "",
-        isValid: false,
-    })
-    const { input, error, isValid } = state
     const inputScore = getScore(input)
-    const segmentColors = Object.values(segments)
+    // @ts-ignore
+    const segmentColors = Object.values(store.useGet("segments/0"))
     return (
         <Column align="center">
             <Row justify="center">
-                <TextInput
-                    value={input}
-                    onChange={({ target }) => {
-                        const { isValid: isValidAfterChange, lastValidPath } =
-                            getValidPaths(target.value, analysis)
-                        setState({
-                            ...state,
-                            isValid: isValidAfterChange,
-                            input: target.value,
-                        })
-                        store.update({
-                            segments: [
-                                getSegments(
-                                    isValidAfterChange,
-                                    lastValidPath,
-                                    segments
-                                ),
-                            ],
-                        })
-                    }}
-                    onKeyPress={({ key }) => {
-                        if (key === "Enter") {
-                            if (!isValid) {
-                                setState({
-                                    ...state,
-                                    error: "You can't spell that!",
-                                })
-                            } else if (input.length < 3) {
-                                setState({
-                                    ...state,
-                                    error: "3+ letters. I believe in you.",
-                                })
-                            } else if (wordsFound.includes(input)) {
-                                setState({
-                                    ...state,
-                                    error: "You already found that!",
-                                })
-                            } else if (!isWord(input)) {
-                                setState({
-                                    ...state,
-                                    error: "I don't think that's a word...",
-                                })
-                            } else {
+                {isMobile ? (
+                    <>
+                        <TextInput style={{ flexGrow: 1 }} kind="underlined">
+                            {input}
+                        </TextInput>
+                        <Button
+                            Icon={BackIcon}
+                            style={{ marginRight: 8 }}
+                            onClick={() =>
                                 store.update({
-                                    wordsFound: (_) => [..._, input],
-                                    score: (_) => _ + inputScore,
-                                    segments: [{}],
-                                })
-                                setState({
-                                    ...state,
-                                    input: "",
-                                    error: "",
-                                    isValid: false,
+                                    input: input.slice(-1),
                                 })
                             }
-                        }
-                    }}
-                />
-                <Text
-                    style={{ color: segmentColors[segmentColors.length - 1] }}
-                >
-                    +{inputScore}
-                </Text>
+                        />
+
+                        <Button
+                            Icon={ClearIcon}
+                            onClick={() =>
+                                store.update({
+                                    input: "",
+                                })
+                            }
+                        />
+
+                        <Button
+                            style={{ marginLeft: 8 }}
+                            Icon={EnterIcon}
+                            onClick={() => store.$.submitInput()}
+                        />
+                    </>
+                ) : (
+                    <>
+                        <TextInput
+                            value={input}
+                            onChange={({ target }) => {
+                                store.update({ input: target.value })
+                            }}
+                            onKeyPress={({ key }) => {
+                                if (key === "Enter") {
+                                    store.$.submitInput(input)
+                                }
+                            }}
+                        />
+                        <Text
+                            style={{
+                                color: segmentColors[segmentColors.length - 1],
+                            }}
+                        >
+                            +{inputScore}
+                        </Text>
+                    </>
+                )}
             </Row>
             {error ? <ErrorText>{error}</ErrorText> : null}
-            {segments
-                ? transform(
-                      segments,
-                      ([segmentName, color], index) => [
-                          index,
-                          <LineTo
-                              key={index}
-                              from={segmentName.split(":")[0]}
-                              to={segmentName.split(":")[1]}
-                              borderWidth={5}
-                              borderColor={color}
-                          />,
-                      ],
-                      { asValueArray: true }
-                  )
-                : null}
         </Column>
     )
 }
