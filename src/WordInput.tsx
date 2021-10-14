@@ -125,7 +125,10 @@ export const WordInput = () => {
                 <TextInput
                     value={input}
                     onChange={({ target }) => {
-                        store.update({ input: target.value, errors: "" })
+                        store.update({
+                            input: target.value.toLowerCase(),
+                            errors: "",
+                        })
                     }}
                     kind="underlined"
                     onKeyPress={({ key }) => {

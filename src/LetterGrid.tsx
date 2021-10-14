@@ -28,7 +28,8 @@ export const LetterGrid = ({}: LetterGridProps) => {
                     {row.map((letter, columnIndex) => {
                         const addLetterToInput = () =>
                             store.update({
-                                input: (current) => `${current}${letter}`,
+                                input: (current) =>
+                                    `${current}${letter}`.toLowerCase(),
                             })
                         return (
                             <Row
@@ -42,6 +43,8 @@ export const LetterGrid = ({}: LetterGridProps) => {
                                         fontSize: `min(${
                                             60 / Math.max(rows, columns)
                                         }vh, 50px)`,
+                                        // Ensure letters appear above segments
+                                        zIndex: 2,
                                     }}
                                 >
                                     {letter}
