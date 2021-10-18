@@ -17,6 +17,7 @@ import { isMobile, Segments, store } from "./state"
 import BackIcon from "@material-ui/icons/KeyboardBackspace"
 import EnterIcon from "@material-ui/icons/Check"
 import ClearIcon from "@material-ui/icons/Clear"
+import { isEmpty } from "@re-do/utils"
 
 export const getValidPaths = (
     input: string,
@@ -24,7 +25,7 @@ export const getValidPaths = (
 ) => {
     const result = {
         isValid: false,
-        lastValidPath: undefined as undefined | LetterPosition[],
+        lastValidPath: [] as LetterPosition[],
         validPaths: [] as LetterPosition[][],
     }
     if (!input) {
@@ -61,10 +62,10 @@ export const getValidPaths = (
 
 export const getSegments = (
     isValid: boolean,
-    lastValidPath: LetterPosition[] | undefined,
+    lastValidPath: LetterPosition[],
     previousSegments: Segments | undefined
 ) => {
-    if (lastValidPath && lastValidPath.length > 1) {
+    if (!isEmpty(lastValidPath)) {
         if (isValid) {
             return lastValidPath!.reduce(
                 (colors, position, index, positions) => {
@@ -112,22 +113,35 @@ export const getSegments = (
 const errorRed = "rgb(255, 0, 0)"
 
 export const WordInput = () => {
-    const { input, error } = store.useQuery({
+    const { error, input } = store.useQuery({
         input: true,
         error: true,
     })
     const inputScore = getScore(input)
     // @ts-ignore
-    const segmentColors = Object.values(store.useGet("segments/0"))
+    const analysis = store.useGet("analysis")[0]
+    // @ts-ignore
+    const segments = store.useGet("segments")[0]
+    const segmentColors = Object.values(segments)
     return (
         <Column align="center">
             <Row justify="center">
                 <TextInput
                     value={input}
                     onChange={({ target }) => {
+                        const updatedInput = target.value.toLowerCase()
+                        const { isValid, lastValidPath } = getValidPaths(
+                            updatedInput,
+                            analysis
+                        )
                         store.update({
-                            input: target.value.toLowerCase(),
+                            currentPath: lastValidPath,
+                            input: updatedInput,
                             errors: "",
+                            isValid,
+                            segments: [
+                                getSegments(isValid, lastValidPath, segments),
+                            ],
                         })
                     }}
                     kind="underlined"

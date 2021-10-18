@@ -16,12 +16,13 @@ export type Segments = {
 export const store = new Store(
     {
         // Putting it in array to avoid statelessly treating it like a substate
-        analysis: [{ adjacencies: {}, grid: [], positions: {}, words: {} }] as [
+        analysis: [{ adjacencies: {}, positions: {}, words: {} }] as [
             LetterAnalysis
         ],
         wordsFound: [] as string[],
         segments: [{}] as [Segments],
         input: "",
+        currentPath: [] as LetterPosition[],
         isValid: false,
         error: "",
         score: 0,
@@ -44,6 +45,7 @@ export const store = new Store(
                 ],
                 score: 0,
                 wordsFound: [],
+                currentPath: [],
                 isValid: false,
                 segments: [{}],
                 revealed: false,
@@ -72,6 +74,7 @@ export const store = new Store(
                 return {
                     wordsFound: (_) => [..._, input],
                     score: (_) => _ + getScore(input),
+                    currentPath: [],
                     segments: [{}],
                     error: "",
                     isValid: false,
@@ -81,26 +84,9 @@ export const store = new Store(
         },
     },
     {
-        onChange: ({ rows, columns, input }, context) => {
+        onChange: ({ rows, columns }, context) => {
             if (rows || columns) {
                 context.store.actions.refreshGrid()
-            }
-            if (input !== undefined) {
-                const { isValid, lastValidPath } = getValidPaths(
-                    input,
-                    // @ts-ignore
-                    context.store.get("analysis")[0]
-                )
-                context.store.update({
-                    isValid,
-                    segments: [
-                        getSegments(
-                            isValid,
-                            lastValidPath,
-                            context.store.get("segments")[0]
-                        ),
-                    ],
-                })
             }
         },
     }

@@ -1,9 +1,10 @@
 import React from "react"
 import { Row, Column, Text } from "@re-do/components"
-import { generateLetterGrid } from "./generateLetterGrid"
-import { isMobile, store } from "./state"
+import { generateLetterGrid, LetterPosition } from "./generateLetterGrid"
+import { store } from "./state"
 import { isEmpty, transform } from "@re-do/utils"
 import LineTo from "react-lineto"
+import { getSegments } from "./WordInput.js"
 
 export type LetterGridProps = {}
 
@@ -12,9 +13,21 @@ export const LetterGrid = ({}: LetterGridProps) => {
     const [analysis] = store.useGet("analysis")
     // @ts-ignore
     const [segments] = store.useGet("segments")
-    const { rows, columns } = store.useQuery({ rows: true, columns: true })
-    if (isEmpty(analysis.grid)) {
-        store.update({ analysis: [generateLetterGrid({ rows, columns })] })
+    const { rows, columns, currentPath } = store.useQuery({
+        rows: true,
+        columns: true,
+        currentPath: true,
+    })
+    const availablePositions = isEmpty(currentPath)
+        ? Object.keys(analysis.adjacencies)
+        : Object.values(
+              analysis.adjacencies[currentPath.at(-1)!].adjacent
+          ).flatMap((_) => _)
+    if (isEmpty(analysis.words)) {
+        // Either this is first render or we generated a grid with no solutions, so generate a new one
+        store.update({
+            analysis: [generateLetterGrid({ rows, columns })],
+        })
     }
     return (
         <Column
@@ -23,37 +36,65 @@ export const LetterGrid = ({}: LetterGridProps) => {
                 width: `min(60vh, ${columns * 80}px)`,
             }}
         >
-            {analysis.grid?.map((row, rowIndex) => (
-                <Row key={rowIndex} justify="center">
-                    {row.map((letter, columnIndex) => {
-                        const addLetterToInput = () =>
-                            store.update({
-                                input: (current) =>
-                                    `${current}${letter}`.toLowerCase(),
-                            })
-                        return (
-                            <Row
-                                key={columnIndex}
-                                justify="center"
-                                onClick={addLetterToInput}
+            {Object.entries(analysis.adjacencies)
+                .reduce((grid, [position, { letter, adjacent }]) => {
+                    const [x, y] = position.split(",").map((_) => parseInt(_))
+                    if (!grid[x]) {
+                        grid[x] = []
+                    }
+                    grid[x][y] = (
+                        <Row
+                            key={y}
+                            justify="center"
+                            onClick={() => {
+                                if (availablePositions.includes(position)) {
+                                    const nextPath = [
+                                        ...currentPath,
+                                        position as LetterPosition,
+                                    ]
+                                    store.update({
+                                        input: nextPath
+                                            .map(
+                                                (position) =>
+                                                    analysis.adjacencies[
+                                                        position!
+                                                    ].letter
+                                            )
+                                            .join(""),
+                                        currentPath: nextPath,
+                                        segments: [
+                                            getSegments(
+                                                true,
+                                                nextPath as LetterPosition[],
+                                                segments
+                                            ),
+                                        ],
+                                        isValid: true,
+                                    })
+                                }
+                            }}
+                        >
+                            <Text
+                                className={`${x},${y}`}
+                                style={{
+                                    fontSize: `min(${
+                                        60 / Math.max(rows, columns)
+                                    }vh, 50px)`,
+                                    // Ensure letters appear above segments
+                                    zIndex: 2,
+                                }}
                             >
-                                <Text
-                                    className={`${rowIndex},${columnIndex}`}
-                                    style={{
-                                        fontSize: `min(${
-                                            60 / Math.max(rows, columns)
-                                        }vh, 50px)`,
-                                        // Ensure letters appear above segments
-                                        zIndex: 2,
-                                    }}
-                                >
-                                    {letter}
-                                </Text>
-                            </Row>
-                        )
-                    })}
-                </Row>
-            ))}
+                                {letter}
+                            </Text>
+                        </Row>
+                    )
+                    return grid
+                }, [] as JSX.Element[][])
+                .map((row, index) => (
+                    <Row key={index} justify="center">
+                        {row}
+                    </Row>
+                ))}
             {segments
                 ? transform(
                       segments,

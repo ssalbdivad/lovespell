@@ -1,10 +1,6 @@
-import React, { useState } from "react"
-import { LetterGrid } from "./LetterGrid"
-import Refresh from "@material-ui/icons/Refresh"
-import Visibility from "@material-ui/icons/Visibility"
+import React from "react"
 import { Button, Column, Row, Text } from "@re-do/components"
-import { isMobile, store } from "./state"
-import { WordInput } from "./WordInput"
+import { store } from "./state"
 import { generateLetterGrid } from "./generateLetterGrid"
 import Slider from "@material-ui/core/Slider"
 
@@ -43,6 +39,7 @@ export const Actions = ({}: ActionsProps) => {
                             score: 0,
                             wordsFound: [],
                             isValid: false,
+                            currentPath: [],
                             segments: [{}],
                             revealed: false,
                             input: "",

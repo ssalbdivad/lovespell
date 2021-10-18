@@ -45,7 +45,6 @@ export type Solutions = {
 }
 
 export type LetterAnalysis = {
-    grid: string[][]
     positions: LetterPositions
     adjacencies: LetterAdjacencies
     words: Solutions
@@ -62,7 +61,6 @@ export const generateLetterGrid = ({
         )
     )
     const analysis: LetterAnalysis = {
-        grid: grid,
         positions: {},
         adjacencies: {},
         words: {},
