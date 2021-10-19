@@ -1,34 +1,29 @@
 import React from "react"
 import { Row, Column, Text } from "@re-do/components"
-import { generateLetterGrid, LetterPosition } from "./generateLetterGrid"
+import { generateLetterGrid, Position } from "./generateGrid"
 import { store } from "./state"
 import { isEmpty, transform } from "@re-do/utils"
-import LineTo from "react-lineto"
-import { getSegments } from "./WordInput.js"
 
 export type LetterGridProps = {}
 
 export const LetterGrid = ({}: LetterGridProps) => {
     // @ts-ignore
     const [analysis] = store.useGet("analysis")
-    // @ts-ignore
-    const [segments] = store.useGet("segments")
-    const { rows, columns, currentPath } = store.useQuery({
+    const { rows, columns, path, mode } = store.useQuery({
         rows: true,
         columns: true,
-        currentPath: true,
+        path: true,
+        mode: true,
     })
-    const availablePositions = isEmpty(currentPath)
-        ? Object.keys(analysis.adjacencies)
-        : Object.values(
-              analysis.adjacencies[currentPath.at(-1)!].adjacent
-          ).flatMap((_) => _)
     if (isEmpty(analysis.words)) {
         // Either this is first render or we generated a grid with no solutions, so generate a new one
         store.update({
-            analysis: [generateLetterGrid({ rows, columns })],
+            analysis: [generateLetterGrid({ rows, columns, mode })],
         })
     }
+    const availablePositions = isEmpty(path)
+        ? Object.keys(analysis.grid)
+        : Object.keys(analysis.grid[path.at(-1)!].adjacent)
     return (
         <Column
             style={{
@@ -36,8 +31,8 @@ export const LetterGrid = ({}: LetterGridProps) => {
                 width: `min(60vh, ${columns * 80}px)`,
             }}
         >
-            {Object.entries(analysis.adjacencies)
-                .reduce((grid, [position, { letter, adjacent }]) => {
+            {Object.entries(analysis.grid)
+                .reduce((grid, [position, { value: letter, adjacent }]) => {
                     const [x, y] = position.split(",").map((_) => parseInt(_))
                     if (!grid[x]) {
                         grid[x] = []
@@ -49,26 +44,18 @@ export const LetterGrid = ({}: LetterGridProps) => {
                             onClick={() => {
                                 if (availablePositions.includes(position)) {
                                     const nextPath = [
-                                        ...currentPath,
-                                        position as LetterPosition,
+                                        ...path,
+                                        position as Position,
                                     ]
                                     store.update({
                                         input: nextPath
                                             .map(
                                                 (position) =>
-                                                    analysis.adjacencies[
-                                                        position!
-                                                    ].letter
+                                                    analysis.grid[position!]
+                                                        .value
                                             )
                                             .join(""),
-                                        currentPath: nextPath,
-                                        segments: [
-                                            getSegments(
-                                                true,
-                                                nextPath as LetterPosition[],
-                                                segments
-                                            ),
-                                        ],
+                                        path: nextPath,
                                         isValid: true,
                                     })
                                 }
@@ -95,22 +82,6 @@ export const LetterGrid = ({}: LetterGridProps) => {
                         {row}
                     </Row>
                 ))}
-            {segments
-                ? transform(
-                      segments,
-                      ([segmentName, color], index) => [
-                          index,
-                          <LineTo
-                              key={index}
-                              from={segmentName.split(":")[0]}
-                              to={segmentName.split(":")[1]}
-                              borderWidth={5}
-                              borderColor={color}
-                          />,
-                      ],
-                      { asValueArray: true }
-                  )
-                : null}
         </Column>
     )
 }

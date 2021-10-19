@@ -2,10 +2,10 @@ import React from "react"
 import { AppContents, Column, Row, Text, DefaultTheme } from "@re-do/components"
 import { StatelessProvider } from "react-statelessly"
 import { isMobile, store } from "./state"
-import { SolutionProgress } from "./SolutionProgress.js"
 import { Game } from "./Game.js"
 import { CssBaseline } from "@material-ui/core"
 import { Actions } from "./Actions.js"
+import { Solutions } from "./Solutions.js"
 
 export const App = () => (
     <StatelessProvider store={store}>
@@ -36,7 +36,7 @@ export const App = () => (
                         {isMobile ? null : <Actions />}
                     </Column>
                     <Column style={{ maxWidth: 600 }} overflow="auto">
-                        <SolutionProgress />
+                        <Solutions />
                         {isMobile ? <Actions /> : null}
                     </Column>
                 </Row>

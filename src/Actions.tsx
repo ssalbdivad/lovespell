@@ -1,8 +1,21 @@
-import React from "react"
+import React, { CSSProperties } from "react"
 import { Button, Column, Row, Text } from "@re-do/components"
-import { store } from "./state"
-import { generateLetterGrid } from "./generateLetterGrid"
+import { Mode, store } from "./state"
 import Slider from "@material-ui/core/Slider"
+import { RadioGroup, FormControlLabel } from "@material-ui/core"
+import { Radio } from "@material-ui/core"
+
+type ActionButtonProps = {
+    text: string
+    style?: CSSProperties
+    onClick: (...args: any[]) => void
+}
+
+const ActionButton = ({ text, style, onClick }: ActionButtonProps) => (
+    <Button style={style} kind="secondary" onClick={onClick}>
+        {text}
+    </Button>
+)
 
 export type ActionsProps = {}
 
@@ -10,45 +23,22 @@ export const Actions = ({}: ActionsProps) => {
     return (
         <Column style={{ padding: 8 }}>
             <Row justify="center">
-                <Button
+                <ActionButton
                     style={{ marginRight: 8 }}
-                    kind="secondary"
                     onClick={() =>
                         store.update({
                             revealed: true,
                         })
                     }
-                >
-                    Spoilers
-                </Button>
-                <Button
+                    text="Spoilers"
+                />
+                <ActionButton
                     style={{ marginLeft: 8 }}
-                    kind="secondary"
+                    text="New Game"
                     onClick={() => {
-                        const { rows, columns } = store.query({
-                            rows: true,
-                            columns: true,
-                        })
-                        store.update({
-                            analysis: [
-                                generateLetterGrid({
-                                    rows,
-                                    columns,
-                                }),
-                            ],
-                            score: 0,
-                            wordsFound: [],
-                            isValid: false,
-                            currentPath: [],
-                            segments: [{}],
-                            revealed: false,
-                            input: "",
-                            error: "",
-                        })
+                        store.$.refreshGrid()
                     }}
-                >
-                    New Game
-                </Button>
+                />
             </Row>
             {/* 
             If we don't specify overflow hidden, the sliders unnecessarily overflow:
@@ -56,6 +46,26 @@ export const Actions = ({}: ActionsProps) => {
              */}
             <Row justify="center" style={{ overflow: "hidden", padding: 16 }}>
                 <Column style={{ paddingRight: 16 }}>
+                    <Text>Mode</Text>
+                    <RadioGroup
+                        defaultValue="pangram"
+                        onChange={({ target }) =>
+                            store.update({ mode: target.value as Mode })
+                        }
+                    >
+                        <FormControlLabel
+                            value="pangram"
+                            control={<Radio />}
+                            label="Pangram"
+                        />
+                        <FormControlLabel
+                            value="freesearch"
+                            control={<Radio />}
+                            label="Freesearch"
+                        />
+                    </RadioGroup>
+                </Column>
+                <Column>
                     <Text>Rows</Text>
                     <Slider
                         defaultValue={3}

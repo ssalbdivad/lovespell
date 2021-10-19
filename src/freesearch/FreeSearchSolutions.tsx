@@ -1,10 +1,9 @@
 import React, { useState } from "react"
-import { store } from "./state"
+import { store } from "../state"
 import CircularProgress from "@material-ui/core/CircularProgress"
 import LinearProgress from "@material-ui/core/LinearProgress"
 import { Column, Row, Text } from "@re-do/components"
-import { getScore } from "./dictionary.js"
-
+import { getScore } from "../dictionary.js"
 import { Icons } from "@re-do/components"
 import Accordion, { AccordionProps } from "@material-ui/core/Accordion"
 import AccordionSummary from "@material-ui/core/AccordionSummary"
@@ -61,7 +60,7 @@ export const bestWordProgressToEmoji: Record<number, string> = {
     10: "🤖",
 }
 
-export const SolutionProgress = ({}: SolutionProgressProps) => {
+export const FreeSearchSolutions = ({}: SolutionProgressProps) => {
     // @ts-ignore
     const solutions = store.useGet("analysis/0/words")
     const wordsFound = store.useGet("wordsFound")

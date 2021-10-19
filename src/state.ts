@@ -1,29 +1,22 @@
-import {
-    generateLetterGrid,
-    LetterAnalysis,
-    LetterPosition,
-} from "./generateLetterGrid"
+import { generateLetterGrid, LetterAnalysis, Position } from "./generateGrid"
 import { Store } from "react-statelessly"
-import { getSegments, getValidPaths } from "./WordInput.js"
 import { getScore, isWord } from "./dictionary.js"
 
 export const isMobile = window.innerWidth <= 800
 
-export type Segments = {
-    [K in `${LetterPosition}:${LetterPosition}`]: `rgb(${number}, ${number}, ${number})`
-}
+export type Mode = "pangram" | "freesearch"
 
 export const store = new Store(
     {
         // Putting it in array to avoid statelessly treating it like a substate
-        analysis: [{ adjacencies: {}, positions: {}, words: {} }] as [
+        analysis: [{ grid: {}, appearancesOf: {}, words: {} }] as [
             LetterAnalysis
         ],
         wordsFound: [] as string[],
-        segments: [{}] as [Segments],
+        mode: "pangram" as Mode,
         input: "",
-        currentPath: [] as LetterPosition[],
-        isValid: false,
+        path: [] as Position[],
+        isValid: true,
         error: "",
         score: 0,
         revealed: false,
@@ -32,22 +25,24 @@ export const store = new Store(
     },
     {
         refreshGrid: (args, store) => {
-            const { rows, columns } = store.query({
+            const { rows, columns, mode } = store.query({
                 rows: true,
                 columns: true,
+                mode: true,
             })
             return {
                 analysis: [
                     generateLetterGrid({
                         rows,
                         columns,
+                        mode,
                     }),
                 ],
                 score: 0,
                 wordsFound: [],
-                currentPath: [],
-                isValid: false,
-                segments: [{}],
+                path: [],
+                input: "",
+                isValid: true,
                 revealed: false,
             }
         },
@@ -59,14 +54,9 @@ export const store = new Store(
             })
             if (!isValid) {
                 return { error: "You can't spell that!" }
-            }
-            // else if (input.length < 3) {
-            //     setError(
-
-            //        "3+ letters. I believe in you.",
-            //     )
-            //}
-            else if (wordsFound.includes(input)) {
+            } else if (input.length < 3) {
+                return { error: "3+ letters. I believe in you." }
+            } else if (wordsFound.includes(input)) {
                 return { error: "You already found that!" }
             } else if (!isWord(input)) {
                 return { error: "I don't think that's a word..." }
@@ -74,18 +64,17 @@ export const store = new Store(
                 return {
                     wordsFound: (_) => [..._, input],
                     score: (_) => _ + getScore(input),
-                    currentPath: [],
-                    segments: [{}],
+                    path: [],
                     error: "",
-                    isValid: false,
+                    isValid: true,
                     input: "",
                 }
             }
         },
     },
     {
-        onChange: ({ rows, columns }, context) => {
-            if (rows || columns) {
+        onChange: ({ rows, columns, mode }, context) => {
+            if (rows || columns || mode) {
                 context.store.actions.refreshGrid()
             }
         },
