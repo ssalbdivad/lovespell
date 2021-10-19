@@ -13,7 +13,7 @@ export const store = new Store(
             LetterAnalysis
         ],
         wordsFound: [] as string[],
-        mode: "pangram" as Mode,
+        mode: "freesearch" as Mode,
         input: "",
         path: [] as Position[],
         isValid: true,

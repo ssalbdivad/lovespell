@@ -111,12 +111,12 @@ export const generateLetterGrid = ({
 
 export const findWords = (grid: Grid<Letter>): Solutions => {
     const words: Solutions = {}
-    const recurse = (prefix: string, path: Position[]) => {
-        const lastPosition = path[path.length - 1]
-        Object.entries(grid[lastPosition].adjacent).forEach(
-            ([position, node]) => {
-                const { value: letter, adjacent } = node.get()
-                const candidateWord = `${prefix}${letter}`
+    const recurse = (prefix: string, node: GridNode, path: Position[]) => {
+        Object.entries(node.adjacent).forEach(
+            ([position, {get}]) => {
+                const adjacentNode = get()
+                
+                const candidateWord = `${prefix}${adjacentNode.value}`
                 const candidateTrie = getTrie(candidateWord)
                 if (!candidateTrie || isEmpty(candidateTrie)) {
                     return
@@ -131,15 +131,12 @@ export const findWords = (grid: Grid<Letter>): Solutions => {
                     }
                     words[candidateWord].paths.push(path)
                 }
-                Object.keys(adjacent).forEach((position) =>
-                    recurse(candidateWord, [...path, position as Position])
-                )
+                recurse(candidateWord, adjacentNode, [...path, position as Position])
             }
         )
     }
-    Object.entries(grid).forEach(([position, { value: firstLetter }]) =>
-        recurse(firstLetter, [position as Position])
+    Object.entries(grid).forEach(([position, node]) =>
+        recurse(node.value, node , [position as Position])
     )
-    console.log(words)
     return words
 }
