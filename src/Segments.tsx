@@ -13,7 +13,7 @@ export const Segments = ({}: SegmentsProps) => {
         isValid: true,
     })
     const segments = path.reduce((segments, position, index) => {
-        if (index === segments.length - 1) {
+        if (index === path.length - 1) {
             return segments
         }
         // Deterministically generate a "random" color based on

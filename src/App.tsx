@@ -5,7 +5,7 @@ import { isMobile, store } from "./state"
 import { Game } from "./Game.js"
 import { CssBaseline } from "@material-ui/core"
 import { Actions } from "./Actions.js"
-import { Solutions } from "./Solutions.js"
+import { Progress } from "./Progress.js"
 
 export const App = () => (
     <StatelessProvider store={store}>
@@ -36,7 +36,7 @@ export const App = () => (
                         {isMobile ? null : <Actions />}
                     </Column>
                     <Column style={{ maxWidth: 600 }} overflow="auto">
-                        <Solutions />
+                        <Progress />
                         {isMobile ? <Actions /> : null}
                     </Column>
                 </Row>

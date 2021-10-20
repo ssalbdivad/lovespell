@@ -26,6 +26,8 @@
     },
     "scripts": {
         "start": "jsrx start",
+        "generateSortedDictionary": "jsrx generateSortedDictionary",
+        "generateWordsTrie": "jsrx generateWordsTrie",
         "build": "jsrx build",
         "jsrxGen": "jsrx jsrxGen"
     }

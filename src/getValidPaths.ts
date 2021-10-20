@@ -1,9 +1,14 @@
 import { Letter } from "./dictionary.js"
-import { Position, LetterAnalysis, adjacentByValue } from "./generateGrid.js"
+import {
+    Position,
+    Analysis,
+    adjacentByValue,
+    maxPositionsUsed,
+} from "./generateGrid.js"
 
 export const getValidPaths = (
     input: string,
-    { appearancesOf, grid }: LetterAnalysis
+    { appearancesOf, grid }: Analysis
 ) => {
     const result = {
         isValid: false,
@@ -33,7 +38,9 @@ export const getValidPaths = (
                 }
             })
             if (nextValidPaths.length) {
-                result.lastValidPath = nextValidPaths[0]
+                // Default to the path that covers the most positions
+                result.lastValidPath = maxPositionsUsed(nextValidPaths)
+                    .path as Position[]
                 result.isValid = true
             } else {
                 result.isValid = false

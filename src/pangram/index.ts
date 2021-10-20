@@ -1,1 +1,2 @@
-export * from "./PangramSolutions.js"
+export * from "./PangramProgress.js"
+export * from "./populateGrid.js"

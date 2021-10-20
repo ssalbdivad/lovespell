@@ -2,7 +2,8 @@ import { jsrx, shell } from "jsrx"
 import { createServer, build, UserConfig } from "vite"
 import { getWebConfig } from "@re-do/configs"
 import { fromHere } from "@re-do/node-utils"
-import { join } from "path"
+import { writeFileSync } from "fs"
+// import { buildSortedDictionary, buildWordsTrie } from "./src/dictionary"
 
 const pkgRoot = fromHere("src")
 
@@ -34,6 +35,18 @@ jsrx(
     {
         dev: {
             start,
+            generateSortedDictionary: async () => {
+                // writeFileSync(
+                //     fromHere("src", "sortedDictionary.json"),
+                //     JSON.stringify(await buildSortedDictionary())
+                // )
+            },
+            generateWordsTrie: async () => {
+                // writeFileSync(
+                //     fromHere("src", "dictionaryTrie.json"),
+                //     JSON.stringify(await buildSortedDictionary())
+                // )
+            },
         },
         prod: {
             build: async () => {

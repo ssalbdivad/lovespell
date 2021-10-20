@@ -1,24 +1,45 @@
-import { transform } from "@re-do/utils"
-import { Letter, letterFrequencies } from "../dictionary.js"
-import { Grid, Position } from "../generateGrid.js"
-import { randomsFromList } from "../random.js"
+import { randomCommonWordByLength } from "../dictionary.js"
+import { Grid, GridAdjacencies, Position } from "../generateGrid.js"
+import { randomFromList } from "../random.js"
 
-const balancedLetterPool = Object.entries(letterFrequencies).reduce(
-    (result: string[], [letter, frequency]) => [
-        ...result,
-        ...letter.repeat(frequency),
-    ],
-    []
-)
-
-export const generateLetters = (count: number) =>
-    randomsFromList(balancedLetterPool, count) as Letter[]
-
-export const populateFreeSearchGrid = (emptyGrid: Grid): Grid<Letter> => {
-    const gridPositions = Object.keys(emptyGrid) as Position[]
-    const randomLetters = generateLetters(gridPositions.length)
-    gridPositions.forEach((position, index) => {
-        emptyGrid[position].value = randomLetters[index]
+export const populatePangramGrid = (emptyGrid: Grid) => {
+    const word = randomCommonWordByLength(Object.keys(emptyGrid).length, 1000)
+    const randomValidPath = (
+        adjacencies: Grid | GridAdjacencies,
+        remaining: string,
+        path: Position[]
+    ): Position[] | null => {
+        if (!remaining) {
+            return path
+        }
+        const candidatePositions = Object.keys(adjacencies).filter(
+            (position) => !path.includes(position as Position)
+        ) as Position[]
+        let result: Position[] | null = null
+        while (candidatePositions.length) {
+            const randomCandidatePosition = randomFromList(candidatePositions)
+            const candidateNode =
+                "get" in adjacencies[randomCandidatePosition]
+                    ? (adjacencies[randomCandidatePosition] as any).get()
+                    : adjacencies[randomCandidatePosition]
+            result = randomValidPath(
+                candidateNode.adjacent,
+                remaining.slice(1),
+                [...path, randomCandidatePosition]
+            )
+            if (result) {
+                return result
+            }
+            candidatePositions.splice(
+                candidatePositions.findIndex(
+                    (position) => position === randomCandidatePosition
+                )
+            )
+        }
+        return null
+    }
+    const pangramPath = randomValidPath(emptyGrid, word, [])
+    pangramPath?.forEach((position, index) => {
+        emptyGrid[position].value = word.at(index)
     })
-    return emptyGrid
 }

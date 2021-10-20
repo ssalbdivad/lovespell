@@ -17,7 +17,7 @@ import { getValidPaths } from "./getValidPaths.js"
 import { randomRgbFromSeed } from "./random.js"
 
 export const WordInput = () => {
-    const { error, input } = store.useQuery({
+    const { input, error } = store.useQuery({
         input: true,
         error: true,
     })
@@ -61,18 +61,24 @@ export const WordInput = () => {
                         <Button
                             Icon={BackIcon}
                             style={{ marginRight: 8 }}
-                            onClick={() =>
+                            onClick={() => {
+                                const updatedInput = input.slice(0, -1)
+                                const { isValid, lastValidPath } =
+                                    getValidPaths(updatedInput, analysis)
                                 store.update({
-                                    input: input.slice(0, -1),
+                                    path: lastValidPath,
+                                    input: updatedInput,
                                     errors: "",
+                                    isValid,
                                 })
-                            }
+                            }}
                         />
 
                         <Button
                             Icon={ClearIcon}
                             onClick={() =>
                                 store.update({
+                                    path: [],
                                     input: "",
                                     errors: "",
                                 })

@@ -4,6 +4,7 @@ import { Mode, store } from "./state"
 import Slider from "@material-ui/core/Slider"
 import { RadioGroup, FormControlLabel } from "@material-ui/core"
 import { Radio } from "@material-ui/core"
+import { maxGridDimensionByMode } from "./generateGrid.js"
 
 type ActionButtonProps = {
     text: string
@@ -20,6 +21,7 @@ const ActionButton = ({ text, style, onClick }: ActionButtonProps) => (
 export type ActionsProps = {}
 
 export const Actions = ({}: ActionsProps) => {
+    const { mode } = store.useQuery({ mode: true })
     return (
         <Column style={{ padding: 8 }}>
             <Row justify="center">
@@ -34,7 +36,7 @@ export const Actions = ({}: ActionsProps) => {
                 />
                 <ActionButton
                     style={{ marginLeft: 8 }}
-                    text="New Game"
+                    text="New Grid"
                     onClick={() => {
                         store.$.refreshGrid()
                     }}
@@ -73,7 +75,7 @@ export const Actions = ({}: ActionsProps) => {
                         step={1}
                         marks
                         min={2}
-                        max={6}
+                        max={maxGridDimensionByMode[mode]}
                         onChange={(e, value) => {
                             store.update({ rows: value as number })
                         }}
@@ -87,7 +89,7 @@ export const Actions = ({}: ActionsProps) => {
                         step={1}
                         marks
                         min={2}
-                        max={6}
+                        max={maxGridDimensionByMode[mode]}
                         onChange={(e, value) => {
                             store.update({ columns: value as number })
                         }}

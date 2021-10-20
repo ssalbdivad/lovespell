@@ -1,8 +1,16 @@
+import { randomInRange } from "./random.js"
+
 // @ts-ignore
 import dictionaryTrieJson from "./dictionaryTrie.json"
 
 // @ts-ignore
 const dictionaryTrie: WordsTrie = dictionaryTrieJson
+
+// @ts-ignore
+import sortedDictionaryJson from "./sortedDictionary.json"
+
+// @ts-ignore
+const sortedDictionary: SortedDictionary = sortedDictionaryJson
 
 export const letterFrequencies = {
     e: 11,
@@ -49,12 +57,32 @@ export type WordsTrie = {
     "!"?: 1
 }
 
-export const buildWordsTrie = (): WordsTrie => {
+export type SortedDictionary = {
+    [wordLength: number]: string[]
+}
+
+export const buildSortedDictionary = async () => {
     // @ts-ignore
-    // const dictionary = import("./dictionary.json")
+    // const dictionary = await import("./dictionaryFrequencies.json")
+    const dictionary = {}
+    const sortedDictionary: SortedDictionary = {}
+    Object.keys(dictionary).forEach((word) => {
+        console.log(`Adding '${word}'...`)
+        if (!sortedDictionary[word.length]) {
+            sortedDictionary[word.length] = [word]
+        } else {
+            sortedDictionary[word.length].push(word)
+        }
+    })
+    return sortedDictionary
+}
+
+export const buildWordsTrie = async () => {
+    // @ts-ignore
+    // const dictionary = await import("./dictionaryFrequencies.json")
     const dictionary = {}
     const wordList = Object.keys(dictionary)
-    const root = {}
+    const root: WordsTrie = {}
     const addSuffixToTrie = (trie: WordsTrie, suffix: string) => {
         if (!suffix) {
             trie["!"] = 1
@@ -91,6 +119,22 @@ export const getTrie = (prefix: string) => {
 }
 
 export const isWord = (input: string) => !!getTrie(input)?.["!"]
+
+export const commonWordsByLength = (length: number, maxResults: number) =>
+    sortedDictionary[length].slice(0, maxResults)
+
+export const randomCommonWordByLength = (
+    length: number,
+    maxWordFrequencyRank: number
+) =>
+    sortedDictionary[length][
+        randomInRange(
+            0,
+            maxWordFrequencyRank <= sortedDictionary[length].length - 1
+                ? maxWordFrequencyRank
+                : sortedDictionary[length].length - 1
+        )
+    ]
 
 export const getScore = (input: string) => {
     if (!input) {
