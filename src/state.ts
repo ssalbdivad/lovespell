@@ -3,6 +3,7 @@ import {
     Analysis,
     Position,
     maxGridDimensionByMode,
+    maxPositionsUsed,
 } from "./generateGrid"
 import { Store } from "react-statelessly"
 import { getScore, isWord } from "./dictionary.js"
@@ -64,12 +65,15 @@ export const store = new Store(
             return getDefaultState({ rows, columns, mode, pangramsFound })
         },
         submitInput: (args, store) => {
-            const { isValid, input, wordsFound, mode } = store.query({
-                wordsFound: true,
-                isValid: true,
-                input: true,
-                mode: true,
-            })
+            const { isValid, input, wordsFound, mode, path, analysis } =
+                store.query({
+                    wordsFound: true,
+                    isValid: true,
+                    input: true,
+                    mode: true,
+                    path: true,
+                    analysis: true,
+                })
             if (!isValid) {
                 return { error: "You can't spell that!" }
             }
@@ -92,6 +96,15 @@ export const store = new Store(
                         input: "",
                     }
                 } else if (mode === "pangram") {
+                    const positionsUsed = maxPositionsUsed([path]).count
+                    const gridPositions = Object.keys(analysis[0].grid).length
+                    if (positionsUsed < gridPositions) {
+                        return {
+                            error: `You missed ${
+                                gridPositions - positionsUsed
+                            } squares! Try paying them a visit.`,
+                        }
+                    }
                     store.update({ pangramsFound: (_) => _ + 1 })
                     store.actions.refreshGrid()
                 }

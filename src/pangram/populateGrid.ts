@@ -3,7 +3,9 @@ import { Grid, GridAdjacencies, Position } from "../generateGrid.js"
 import { randomFromList } from "../random.js"
 
 export const populatePangramGrid = (emptyGrid: Grid) => {
-    const word = randomCommonWordByLength(Object.keys(emptyGrid).length, 1000)
+    const word = randomCommonWordByLength(Object.keys(emptyGrid).length, {
+        percent: 15,
+    })
     const randomValidPath = (
         adjacencies: Grid | GridAdjacencies,
         remaining: string,

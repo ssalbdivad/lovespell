@@ -120,21 +120,25 @@ export const getTrie = (prefix: string) => {
 
 export const isWord = (input: string) => !!getTrie(input)?.["!"]
 
-export const commonWordsByLength = (length: number, maxResults: number) =>
-    sortedDictionary[length].slice(0, maxResults)
+export type CommonWordsByLengthOptions = {
+    maxResults?: number
+    percent?: number
+}
 
 export const randomCommonWordByLength = (
     length: number,
-    maxWordFrequencyRank: number
-) =>
-    sortedDictionary[length][
-        randomInRange(
-            0,
-            maxWordFrequencyRank <= sortedDictionary[length].length - 1
-                ? maxWordFrequencyRank
-                : sortedDictionary[length].length - 1
-        )
-    ]
+    { maxResults, percent }: CommonWordsByLengthOptions = {}
+) => {
+    const wordsOfLength = sortedDictionary[length]
+    let maxIndex = wordsOfLength.length - 1
+    if (percent) {
+        maxIndex = Math.floor((maxIndex * percent) / 100)
+    }
+    if (maxResults && maxIndex > maxResults) {
+        maxIndex = maxResults
+    }
+    return wordsOfLength[randomInRange(0, maxIndex)]
+}
 
 export const getScore = (input: string) => {
     if (!input) {

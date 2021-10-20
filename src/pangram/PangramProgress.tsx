@@ -21,7 +21,7 @@ export const PangramProgress = () => {
     const positionsUsedForInput = maxPositionsUsed([path]).count
     const percent = (positionsUsedForInput / max.count) * 100
     return (
-        <Column align="center" style={{ maxHeight: 200 }}>
+        <Column align="center">
             <CircularProgress
                 value={percent}
                 variant="determinate"
