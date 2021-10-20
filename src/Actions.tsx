@@ -5,6 +5,7 @@ import Slider from "@material-ui/core/Slider"
 import { RadioGroup, FormControlLabel } from "@material-ui/core"
 import { Radio } from "@material-ui/core"
 import { maxGridDimensionByMode } from "./generateGrid.js"
+import { getValidPaths } from "./getValidPaths.js"
 
 type ActionButtonProps = {
     text: string
@@ -21,10 +22,39 @@ const ActionButton = ({ text, style, onClick }: ActionButtonProps) => (
 export type ActionsProps = {}
 
 export const Actions = ({}: ActionsProps) => {
-    const { mode } = store.useQuery({ mode: true })
+    const { mode, currentPangram, hint } = store.useQuery({
+        mode: true,
+        currentPangram: true,
+        hint: true,
+    })
+    // @ts-ignore
+    const analysis = store.useGet("analysis")[0]
     return (
         <Column style={{ padding: 8 }}>
             <Row justify="center">
+                {mode === "pangram" ? (
+                    <ActionButton
+                        style={{ marginRight: 8 }}
+                        onClick={() => {
+                            if (hint !== currentPangram) {
+                                const updatedHint =
+                                    hint + currentPangram.at(hint.length)
+                                const { lastValidPath } = getValidPaths(
+                                    updatedHint,
+                                    analysis
+                                )
+                                store.update({
+                                    hint: updatedHint,
+                                    input: updatedHint,
+                                    error: "",
+                                    path: lastValidPath,
+                                    isValid: true,
+                                })
+                            }
+                        }}
+                        text="Hint"
+                    />
+                ) : null}
                 <ActionButton
                     style={{ marginRight: 8 }}
                     onClick={() =>

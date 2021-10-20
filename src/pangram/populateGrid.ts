@@ -1,6 +1,7 @@
 import { randomCommonWordByLength } from "../dictionary.js"
 import { Grid, GridAdjacencies, Position } from "../generateGrid.js"
 import { randomFromList } from "../random.js"
+import { store } from "../state.js"
 
 export const populatePangramGrid = (emptyGrid: Grid) => {
     const word = randomCommonWordByLength(Object.keys(emptyGrid).length, {

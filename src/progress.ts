@@ -1,5 +1,6 @@
 import { getScore } from "./dictionary.js"
 import { Position, Solutions } from "./generateGrid.js"
+import { store } from "./state.js"
 
 export type SolutionProgressProps = {}
 
@@ -124,6 +125,7 @@ export const getProgress = ({ solutions, wordsFound }: GetProgressOptions) => {
             emoji: progressToEmoji(bestWordPercent),
         },
     }
+    store.update({ currentPangram: maxPositionsUsedWord })
     const positionsUsedPercent = (mostPositionsUsed / maxPositionsUsed) * 100
     const positionsUsedProgress = {
         current: {

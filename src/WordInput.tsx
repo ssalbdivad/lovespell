@@ -17,9 +17,10 @@ import { getValidPaths } from "./getValidPaths.js"
 import { randomRgbFromSeed } from "./random.js"
 
 export const WordInput = () => {
-    const { input, error } = store.useQuery({
+    const { input, error, hint } = store.useQuery({
         input: true,
         error: true,
+        hint: true,
     })
     const inputScore = getScore(input)
     // @ts-ignore
@@ -28,7 +29,7 @@ export const WordInput = () => {
         <Column align="center">
             <Row justify="center">
                 <TextInput
-                    value={input}
+                    value={input || hint}
                     onChange={({ target }) => {
                         const updatedInput = target.value.toLowerCase()
                         const { isValid, lastValidPath } = getValidPaths(
@@ -62,27 +63,34 @@ export const WordInput = () => {
                             Icon={BackIcon}
                             style={{ marginRight: 8 }}
                             onClick={() => {
-                                const updatedInput = input.slice(0, -1)
-                                const { isValid, lastValidPath } =
-                                    getValidPaths(updatedInput, analysis)
-                                store.update({
-                                    path: lastValidPath,
-                                    input: updatedInput,
-                                    errors: "",
-                                    isValid,
-                                })
+                                if (input.length > hint.length) {
+                                    const updatedInput = input.slice(0, -1)
+                                    const { isValid, lastValidPath } =
+                                        getValidPaths(updatedInput, analysis)
+                                    store.update({
+                                        path: lastValidPath,
+                                        input: updatedInput,
+                                        errors: "",
+                                        isValid,
+                                    })
+                                }
                             }}
                         />
 
                         <Button
                             Icon={ClearIcon}
-                            onClick={() =>
+                            onClick={() => {
+                                const { lastValidPath } = getValidPaths(
+                                    hint,
+                                    analysis
+                                )
                                 store.update({
-                                    path: [],
-                                    input: "",
+                                    path: lastValidPath,
+                                    input: hint,
                                     errors: "",
+                                    isValid: true,
                                 })
-                            }
+                            }}
                         />
 
                         <Button
