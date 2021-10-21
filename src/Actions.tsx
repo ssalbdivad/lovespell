@@ -34,7 +34,7 @@ export const Actions = ({}: ActionsProps) => {
             <Row justify="center">
                 {mode === "pangram" ? (
                     <ActionButton
-                        style={{ marginRight: 8 }}
+                        style={{ marginRight: 8, marginLeft: 8 }}
                         onClick={() => {
                             if (hint !== currentPangram) {
                                 const updatedHint =
@@ -56,7 +56,7 @@ export const Actions = ({}: ActionsProps) => {
                     />
                 ) : null}
                 <ActionButton
-                    style={{ marginRight: 8 }}
+                    style={{ marginLeft: 8, marginRight: 8 }}
                     onClick={() =>
                         store.update({
                             revealed: true,
@@ -65,7 +65,7 @@ export const Actions = ({}: ActionsProps) => {
                     text="Spoilers"
                 />
                 <ActionButton
-                    style={{ marginLeft: 8 }}
+                    style={{ marginLeft: 8, marginRight: 8 }}
                     text="New Grid"
                     onClick={() => {
                         store.$.refreshGrid()

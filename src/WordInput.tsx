@@ -32,18 +32,20 @@ export const WordInput = () => {
                     value={input}
                     onChange={({ target }) => {
                         const updatedInput = target.value.toLowerCase()
-                        if (updatedInput.startsWith(hint)) {
-                            const { isValid, lastValidPath } = getValidPaths(
-                                updatedInput,
-                                analysis
-                            )
-                            store.update({
-                                path: lastValidPath,
-                                input: updatedInput,
-                                errors: "",
-                                isValid,
-                            })
-                        }
+                        const validatedInput = updatedInput.startsWith(hint)
+                            ? updatedInput
+                            : hint
+
+                        const { isValid, lastValidPath } = getValidPaths(
+                            validatedInput,
+                            analysis
+                        )
+                        store.update({
+                            path: lastValidPath,
+                            input: validatedInput,
+                            errors: "",
+                            isValid,
+                        })
                     }}
                     kind="underlined"
                     onKeyPress={({ key }) => {
