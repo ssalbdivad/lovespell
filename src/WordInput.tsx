@@ -29,19 +29,21 @@ export const WordInput = () => {
         <Column align="center">
             <Row justify="center">
                 <TextInput
-                    value={input || hint}
+                    value={input}
                     onChange={({ target }) => {
                         const updatedInput = target.value.toLowerCase()
-                        const { isValid, lastValidPath } = getValidPaths(
-                            updatedInput,
-                            analysis
-                        )
-                        store.update({
-                            path: lastValidPath,
-                            input: updatedInput,
-                            errors: "",
-                            isValid,
-                        })
+                        if (updatedInput.startsWith(hint)) {
+                            const { isValid, lastValidPath } = getValidPaths(
+                                updatedInput,
+                                analysis
+                            )
+                            store.update({
+                                path: lastValidPath,
+                                input: updatedInput,
+                                errors: "",
+                                isValid,
+                            })
+                        }
                     }}
                     kind="underlined"
                     onKeyPress={({ key }) => {
