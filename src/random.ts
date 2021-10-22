@@ -23,5 +23,17 @@ export const randomRgbFromSeed = (seed: any) => {
     const red = randomFromSeed({ red: seed }, 0, 255)
     const green = randomFromSeed({ green: seed }, 0, 255)
     const blue = randomFromSeed({ blue: seed }, 0, 255)
-    return `rgb(${red}, ${green}, ${blue})`
+    return { red, green, blue }
+}
+
+export type RandomRgbStringFromSeedOptions = {
+    transparency?: number
+}
+
+export const randomRgbStringFromSeed = (
+    seed: any,
+    { transparency }: RandomRgbStringFromSeedOptions = {}
+) => {
+    const { red, green, blue } = randomRgbFromSeed(seed)
+    return `rgba(${red}, ${green}, ${blue}, ${transparency ?? 1})`
 }

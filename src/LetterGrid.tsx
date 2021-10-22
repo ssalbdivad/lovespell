@@ -3,8 +3,35 @@ import { Row, Column, Text } from "@re-do/components"
 import { generateLetterGrid, Position } from "./generateGrid"
 import { store } from "./state"
 import { isEmpty, transform } from "@re-do/utils"
+import { randomRgbFromSeed, randomRgbStringFromSeed } from "./random.js"
+import { Letter } from "./dictionary.js"
 
 export type LetterGridProps = {}
+
+export const colorForPosition = (
+    position: Position,
+    letter: Letter,
+    path: Position[]
+) =>
+    randomRgbFromSeed({
+        position,
+        letter,
+    })
+
+export const colorStringForPosition = (
+    position: Position,
+    letter: Letter,
+    path: Position[]
+) =>
+    randomRgbStringFromSeed(
+        {
+            position,
+            letter,
+        },
+        {
+            transparency: path.includes(position as Position) ? 1 : 0.2,
+        }
+    )
 
 export const LetterGrid = ({}: LetterGridProps) => {
     // @ts-ignore
@@ -27,8 +54,8 @@ export const LetterGrid = ({}: LetterGridProps) => {
     return (
         <Column
             style={{
-                height: `min(60vh, ${rows * 80}px)`,
-                width: `min(60vh, ${columns * 80}px)`,
+                height: `min(60vh, ${rows * 88}px)`,
+                width: `min(60vh, ${columns * 88}px)`,
             }}
         >
             {Object.entries(analysis.grid)
@@ -37,10 +64,22 @@ export const LetterGrid = ({}: LetterGridProps) => {
                     if (!grid[x]) {
                         grid[x] = []
                     }
+                    const color = colorStringForPosition(
+                        position as Position,
+                        letter,
+                        path
+                    )
                     grid[x][y] = (
                         <Row
                             key={y}
                             justify="center"
+                            style={{
+                                margin: 4,
+                                border: `solid ${color}`,
+                                borderRadius: "50%",
+                                boxShadow:
+                                    "0.3em 0.3em 0 0 rgba(15, 28, 63, 0.125)",
+                            }}
                             onClick={() => {
                                 if (availablePositions.includes(position)) {
                                     const nextPath = [

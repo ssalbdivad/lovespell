@@ -7,14 +7,13 @@ import {
     ErrorText,
     Button,
 } from "@re-do/components"
-import { isWord, getScore } from "./dictionary.js"
+import { getScore } from "./dictionary.js"
 import { isMobile, store } from "./state"
 import BackIcon from "@material-ui/icons/KeyboardBackspace"
 import EnterIcon from "@material-ui/icons/Check"
 import ClearIcon from "@material-ui/icons/Clear"
-import { isEmpty } from "@re-do/utils"
 import { getValidPaths } from "./getValidPaths.js"
-import { randomRgbFromSeed } from "./random.js"
+import { randomRgbStringFromSeed } from "./random.js"
 
 export const WordInput = () => {
     const { input, error, hint } = store.useQuery({
@@ -56,7 +55,7 @@ export const WordInput = () => {
                 />
                 <Text
                     style={{
-                        color: randomRgbFromSeed(inputScore),
+                        color: randomRgbStringFromSeed(inputScore),
                     }}
                 >
                     +{inputScore}

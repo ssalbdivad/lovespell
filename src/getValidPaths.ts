@@ -21,7 +21,9 @@ export const getValidPaths = (
     if (!appearancesOf[input[0]]) {
         return result
     }
+    result.isValid = true
     result.validPaths = appearancesOf[input[0]].map((position) => [position])
+    result.lastValidPath = result.validPaths[0]
     input
         .substring(1)
         .split("")
