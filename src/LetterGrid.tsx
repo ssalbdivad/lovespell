@@ -44,7 +44,7 @@ export const LetterGrid = ({}: LetterGridProps) => {
     })
     const availablePositions = isEmpty(path)
         ? Object.keys(analysis.grid)
-        : Object.keys(analysis.grid[path.at(-1)!].adjacent)
+        : Object.keys(analysis.grid[path[path.length - 1]].adjacent)
     return (
         <Column
             style={{

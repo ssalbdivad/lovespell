@@ -18,7 +18,11 @@ const getWebsiteConfig = ({ watch = false }: GetConfigArgs = {}) =>
         watch,
         options: {
             build: {
+                target: "modules",
                 sourcemap: false,
+                terserOptions: {
+                    ecma: 2015,
+                },
             },
             server: {
                 port: Number(process.env.VITE_DEV_SERVER_PORT),

@@ -21,14 +21,14 @@ export const Segments = ({}: SegmentsProps) => {
         const nextPosition = path[index + 1]
         const { red, green, blue } = colorForPosition(
             position,
-            input.at(index) as Letter,
+            input[index] as Letter,
             path
         )
         const {
             red: nextRed,
             green: nextGreen,
             blue: nextBlue,
-        } = colorForPosition(nextPosition, input.at(index + 1) as Letter, path)
+        } = colorForPosition(nextPosition, input[index + 1] as Letter, path)
         const averageColorOfConnectedPositions = `rgb(${(red + nextRed) / 2}, ${
             (green + nextGreen) / 2
         }, ${(blue + nextBlue) / 2})`

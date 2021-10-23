@@ -38,7 +38,7 @@ export const Actions = ({}: ActionsProps) => {
                         onClick={() => {
                             if (hint !== currentPangram) {
                                 const updatedHint =
-                                    hint + currentPangram.at(hint.length)
+                                    hint + currentPangram[hint.length]
                                 const { lastValidPath } = getValidPaths(
                                     updatedHint,
                                     analysis

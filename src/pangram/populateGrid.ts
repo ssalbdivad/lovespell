@@ -43,6 +43,6 @@ export const populatePangramGrid = (emptyGrid: Grid) => {
     }
     const pangramPath = randomValidPath(emptyGrid, word, [])
     pangramPath?.forEach((position, index) => {
-        emptyGrid[position].value = word.at(index)
+        emptyGrid[position].value = word[index]
     })
 }
