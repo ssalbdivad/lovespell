@@ -29,7 +29,9 @@ export const getValidPaths = (
         .split("")
         .forEach((char) => {
             const nextValidPaths: Position[][] = []
-            result.validPaths.forEach((path) => {
+            // Just look at the first 50 valid paths to avoid exponential growth
+            // in a case like "aaaaaaaaaa" in a grid where every letter is "a"
+            result.validPaths.slice(0, 50).forEach((path) => {
                 const nextValidPositions = adjacentByValue(
                     grid[path[path.length - 1]].adjacent
                 )[char as Letter]

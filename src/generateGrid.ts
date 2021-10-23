@@ -105,17 +105,29 @@ export const generateLetterGrid = ({
             }
         })
     })
-    if (mode === "freesearch") {
-        populateFreeSearchGrid(grid)
-    } else if (mode === "pangram") {
-        populatePangramGrid(grid)
-    } else {
-        throw new Error(`Unknown mode ${mode}.`)
+    let attemptsRemaining = 5
+    let solutions: Solutions = {}
+    while (isEmpty(solutions)) {
+        if (attemptsRemaining === 0) {
+            throw new Error(
+                `Unable to generate a valid ${mode} grid with ${rows} rows and ${columns} columns.`
+            )
+        }
+        if (mode === "freesearch") {
+            populateFreeSearchGrid(grid)
+            solutions = findWords(grid)
+        } else if (mode === "pangram") {
+            populatePangramGrid(grid)
+            solutions = findWords(grid)
+        } else {
+            throw new Error(`Unknown mode ${mode}.`)
+        }
+        attemptsRemaining--
     }
     const analysis: Analysis = {
         appearancesOf: adjacentByValue(grid),
         grid,
-        solutions: findWords(grid),
+        solutions,
     }
     return analysis
 }

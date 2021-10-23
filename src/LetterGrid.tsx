@@ -42,12 +42,6 @@ export const LetterGrid = ({}: LetterGridProps) => {
         path: true,
         mode: true,
     })
-    if (isEmpty(analysis.solutions)) {
-        // Either this is first render or we generated a grid with no solutions, so generate a new one
-        store.update({
-            analysis: [generateLetterGrid({ rows, columns, mode })],
-        })
-    }
     const availablePositions = isEmpty(path)
         ? Object.keys(analysis.grid)
         : Object.keys(analysis.grid[path.at(-1)!].adjacent)
