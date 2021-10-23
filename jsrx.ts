@@ -2,7 +2,7 @@ import { jsrx, shell } from "jsrx"
 import { createServer, build, UserConfig } from "vite"
 import { getWebConfig } from "@re-do/configs"
 import { fromHere } from "@re-do/node-utils"
-import { writeFileSync } from "fs"
+import { cpSync, readFileSync, writeFileSync } from "fs"
 // import { buildSortedDictionary, buildWordsTrie } from "./src/dictionary"
 
 const pkgRoot = fromHere("src")
@@ -52,6 +52,14 @@ jsrx(
             build: async () => {
                 shell("tsc --noEmit")
                 await build(getWebsiteConfig())
+                cpSync("CNAME", "docs/CNAME")
+                const indexHtmlWithRelativePaths = readFileSync(
+                    "docs/index.html"
+                )
+                    .toString()
+                    .replace(/\/assets/g, "./assets")
+                    .replace(/\/index/g, "./index")
+                writeFileSync("docs/index.html", indexHtmlWithRelativePaths)
             },
         },
     },
