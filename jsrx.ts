@@ -54,15 +54,17 @@ jsrx(
         },
         prod: {
             build: async () => {
-                shell("tsc --noEmit")
-                await build(getWebsiteConfig())
+                // shell("tsc --noEmit")
+                // await build(getWebsiteConfig())
                 cpSync("CNAME", "docs/CNAME")
+                cpSync("src/assets/icon.png", "docs/assets/icon.png")
                 const indexHtmlWithRelativePaths = readFileSync(
                     "docs/index.html"
                 )
                     .toString()
-                    .replace(/\/assets/g, "./assets")
-                    .replace(/\/index/g, "./index")
+                    .replace(/\"\/assets/g, "./assets")
+                    .replace(/\"\/index/g, "./index")
+                    .replace(/\"data:image.*\"/g, "./assets/icon.png")
                 writeFileSync("docs/index.html", indexHtmlWithRelativePaths)
             },
         },
