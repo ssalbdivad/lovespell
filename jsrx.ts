@@ -64,7 +64,7 @@ jsrx(
                     .toString()
                     .replace(/\"\/assets/g, "./assets")
                     .replace(/\"\/index/g, "./index")
-                    .replace(/\"data:image.*\"/g, "./assets/icon.png")
+                    .replace(/\"data:image.*\"/g, '"./assets/icon.png"')
                 writeFileSync("docs/index.html", indexHtmlWithRelativePaths)
             },
         },
