@@ -1,17 +1,18 @@
 import {
-    generateLetterGrid,
+    fillLetterGrid,
     Analysis,
     Position,
-    maxGridDimensionByMode,
+    gridDimensionsByMode,
     maxPositionsUsed,
+    generateLetterGrid,
 } from "./generateGrid"
 import { Store } from "react-statelessly"
 import { getScore, isWord } from "./dictionary.js"
-import { withDefaults } from "@re-do/utils"
+import { transform, withDefaults } from "@re-do/utils"
 
 export const isMobile = window.innerWidth <= 800
 
-export type Mode = "pangram" | "freesearch"
+export type Mode = "pangram" | "freesearch" | "perpetual"
 
 export type GetDefaultStateArgs = {
     mode?: Mode
@@ -48,6 +49,8 @@ export const getDefaultState = (args: GetDefaultStateArgs = {}) => {
         columns,
         mode,
         pangramsFound,
+        lastGameStart: 0,
+        gameOver: false,
     }
 }
 
@@ -66,15 +69,30 @@ export const store = new Store(
             return getDefaultState({ rows, columns, mode, pangramsFound })
         },
         submitInput: (args, store) => {
-            const { isValid, input, wordsFound, mode, path, analysis } =
-                store.query({
-                    wordsFound: true,
-                    isValid: true,
-                    input: true,
-                    mode: true,
-                    path: true,
-                    analysis: true,
-                })
+            const {
+                isValid,
+                input,
+                wordsFound,
+                mode,
+                path,
+                analysis,
+                lastGameStart,
+                gameOver,
+            } = store.query({
+                wordsFound: true,
+                isValid: true,
+                input: true,
+                mode: true,
+                path: true,
+                analysis: true,
+                lastGameStart: true,
+                gameOver: true,
+            })
+            if (gameOver) {
+                return {
+                    error: "You can't spell any more words until you start a new game.",
+                }
+            }
             if (!isValid) {
                 return { error: "You can't spell that!" }
             }
@@ -82,12 +100,13 @@ export const store = new Store(
                 return { error: "" }
             } else if (input.length < 3) {
                 return { error: "3+ letters. I believe in you." }
-            } else if (wordsFound.includes(input)) {
-                return { error: "You already found that!" }
             } else if (!isWord(input)) {
                 return { error: "I don't think that's a word..." }
             } else {
                 if (mode === "freesearch") {
+                    if (wordsFound.includes(input)) {
+                        return { error: "You already found that!" }
+                    }
                     return {
                         wordsFound: (_) => [..._, input],
                         score: (_) => _ + getScore(input),
@@ -95,7 +114,6 @@ export const store = new Store(
                         error: "",
                         isValid: true,
                         input: "",
-                        hint: [],
                     }
                 } else if (mode === "pangram") {
                     const positionsUsed = maxPositionsUsed([path]).count
@@ -109,6 +127,27 @@ export const store = new Store(
                     }
                     store.update({ pangramsFound: (_) => _ + 1 })
                     store.actions.refreshGrid()
+                } else if (mode === "perpetual") {
+                    path.forEach((position) => {
+                        analysis[0].grid[position].value = undefined as any
+                    })
+                    return {
+                        score: (_) => _ + getScore(input),
+                        path: [],
+                        error: "",
+                        isValid: true,
+                        input: "",
+                        revealed: false,
+                        analysis: [
+                            fillLetterGrid({
+                                grid: analysis[0].grid,
+                                mode: "perpetual",
+                            }),
+                        ],
+                        lastGameStart: lastGameStart
+                            ? lastGameStart
+                            : Date.now(),
+                    }
                 }
                 return {}
             }
@@ -128,15 +167,15 @@ export const store = new Store(
                 context.store.update({
                     rows: min(
                         currentDimensions.rows,
-                        maxGridDimensionByMode[mode]
+                        gridDimensionsByMode[mode].max
                     ),
                     columns: min(
                         currentDimensions.columns,
-                        maxGridDimensionByMode[mode]
+                        gridDimensionsByMode[mode].max
                     ),
                     pangramsFound: 0,
                 })
-                context.store.actions.refreshGrid()
+                context.store.actions.refreshGrid({ mode })
             }
         },
     }

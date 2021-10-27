@@ -1,4 +1,4 @@
-import { randomInRange } from "./random.js"
+import { randomInRange, randomsFromList } from "./random.js"
 
 // @ts-ignore
 import dictionaryTrieJson from "./dictionaryTrie.json"
@@ -47,6 +47,17 @@ export const letterScores = Object.fromEntries(
         Math.round(20 / frequency),
     ])
 )
+
+const balancedLetterPool = Object.entries(letterFrequencies).reduce(
+    (result: string[], [letter, frequency]) => [
+        ...result,
+        ...letter.repeat(frequency),
+    ],
+    []
+)
+
+export const generateLetters = (count: number) =>
+    randomsFromList(balancedLetterPool, count) as Letter[]
 
 export type Letter = keyof typeof letterFrequencies
 export const alphabet = Object.keys(letterFrequencies) as Letter[]

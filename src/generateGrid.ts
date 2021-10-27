@@ -2,6 +2,7 @@ import { isEmpty, Key } from "@re-do/utils"
 import { getScore, getTrie, Letter } from "./dictionary.js"
 import { populateFreeSearchGrid } from "./freesearch/populateGrid.js"
 import { populatePangramGrid } from "./pangram/populateGrid.js"
+import { populatePerpetualGrid } from "./perpetual/populateGrid.js"
 import { Mode } from "./state.js"
 
 export type Position<
@@ -45,17 +46,34 @@ export type Analysis = {
     solutions: Solutions
 }
 
-type GenerateGridOptions = {
-    rows: number
-    columns: number
+type FillGridOptions = {
+    grid: Grid<any>
     mode: Mode
 }
 
-export const maxGridDimensionByMode: { [K in Mode]: number } = {
-    pangram: 4,
-    freesearch: 7,
+export const gridDimensionsByMode: {
+    [K in Mode]: {
+        min: number
+        max: number
+        default: number
+    }
+} = {
+    pangram: {
+        min: 2,
+        default: 3,
+        max: 4,
+    },
+    freesearch: {
+        min: 2,
+        default: 3,
+        max: 7,
+    },
+    perpetual: {
+        min: 2,
+        default: 3,
+        max: 7,
+    },
 }
-
 export const adjacentByValue = <T extends Key>(
     node: GridAdjacencies<T> | Grid<T>
 ) =>
@@ -68,11 +86,15 @@ export const adjacentByValue = <T extends Key>(
         } as AdjacentByValue<T>
     }, {} as AdjacentByValue<T>)
 
-export const generateLetterGrid = ({
+export type GenerateEmptyGridOptions = {
+    rows: number
+    columns: number
+}
+
+export const generateEmptyGrid = ({
     rows,
     columns,
-    mode,
-}: GenerateGridOptions) => {
+}: GenerateEmptyGridOptions) => {
     const grid: Grid = {}
     ;[...Array(rows)].forEach((_, rowIndex) => {
         const adjacentRows = [rowIndex - 1, rowIndex, rowIndex + 1].filter(
@@ -105,12 +127,32 @@ export const generateLetterGrid = ({
             }
         })
     })
+    return grid
+}
+
+export type GenerateLetterGridOptions = Omit<
+    FillGridOptions & GenerateEmptyGridOptions,
+    "grid"
+>
+
+export const generateLetterGrid = ({
+    rows,
+    columns,
+    mode,
+}: GenerateLetterGridOptions) => {
+    const grid = generateEmptyGrid({ rows, columns })
+    return fillLetterGrid({ grid, mode })
+}
+
+export const fillLetterGrid = ({ grid, mode }: FillGridOptions) => {
     let attemptsRemaining = 5
     let solutions: Solutions = {}
     while (isEmpty(solutions)) {
         if (attemptsRemaining === 0) {
             throw new Error(
-                `Unable to generate a valid ${mode} grid with ${rows} rows and ${columns} columns.`
+                `Unable to generate a valid ${mode} grid of length ${
+                    Object.keys(grid).length
+                }.`
             )
         }
         if (mode === "freesearch") {
@@ -125,6 +167,13 @@ export const generateLetterGrid = ({
                     score: getScore(word),
                     positionsUsed: path.length,
                 },
+            }
+        } else if (mode === "perpetual") {
+            populatePerpetualGrid(grid)
+            solutions = findWords(grid)
+            if (Object.keys(solutions).length < 10) {
+                populateFreeSearchGrid(grid)
+                solutions = findWords(grid)
             }
         } else {
             throw new Error(`Unknown mode ${mode}.`)

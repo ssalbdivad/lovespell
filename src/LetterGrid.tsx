@@ -1,6 +1,6 @@
 import React from "react"
 import { Row, Column, Text } from "@re-do/components"
-import { generateLetterGrid, Position } from "./generateGrid"
+import { fillLetterGrid, Position } from "./generateGrid"
 import { store } from "./state"
 import { isEmpty, transform } from "@re-do/utils"
 import { randomRgbFromSeed, randomRgbStringFromSeed } from "./random.js"

@@ -4,7 +4,7 @@ import { Mode, store } from "./state"
 import Slider from "@material-ui/core/Slider"
 import { RadioGroup, FormControlLabel } from "@material-ui/core"
 import { Radio } from "@material-ui/core"
-import { maxGridDimensionByMode, pathToWord } from "./generateGrid.js"
+import { gridDimensionsByMode, pathToWord } from "./generateGrid.js"
 
 type ActionButtonProps = {
     text: string
@@ -68,7 +68,7 @@ export const Actions = ({}: ActionsProps) => {
                 />
                 <ActionButton
                     style={{ marginLeft: 8, marginRight: 8 }}
-                    text="New Grid"
+                    text="New Game"
                     onClick={() => {
                         store.$.refreshGrid()
                     }}
@@ -97,17 +97,22 @@ export const Actions = ({}: ActionsProps) => {
                             control={<Radio />}
                             label="Freesearch"
                         />
+                        <FormControlLabel
+                            value="perpetual"
+                            control={<Radio />}
+                            label="Perpetual"
+                        />
                     </RadioGroup>
                 </Column>
                 <Column>
                     <Text>Rows</Text>
                     <Slider
-                        defaultValue={3}
+                        defaultValue={gridDimensionsByMode[mode].default}
                         valueLabelDisplay="auto"
                         step={1}
                         marks
-                        min={2}
-                        max={maxGridDimensionByMode[mode]}
+                        min={gridDimensionsByMode[mode].min}
+                        max={gridDimensionsByMode[mode].max}
                         onChange={(e, value) => {
                             store.update({ rows: value as number })
                         }}
@@ -116,12 +121,12 @@ export const Actions = ({}: ActionsProps) => {
                 <Column style={{ paddingLeft: 16 }}>
                     <Text>Columns</Text>
                     <Slider
-                        defaultValue={3}
+                        defaultValue={gridDimensionsByMode[mode].default}
                         valueLabelDisplay="auto"
                         step={1}
                         marks
-                        min={2}
-                        max={maxGridDimensionByMode[mode]}
+                        min={gridDimensionsByMode[mode].min}
+                        max={gridDimensionsByMode[mode].max}
                         onChange={(e, value) => {
                             store.update({ columns: value as number })
                         }}
