@@ -125,7 +125,6 @@ export const getProgress = ({ solutions, wordsFound }: GetProgressOptions) => {
             emoji: progressToEmoji(bestWordPercent),
         },
     }
-    store.update({ currentPangram: maxPositionsUsedWord })
     const positionsUsedPercent = (mostPositionsUsed / maxPositionsUsed) * 100
     const positionsUsedProgress = {
         current: {

@@ -14,16 +14,26 @@ import EnterIcon from "@material-ui/icons/Check"
 import ClearIcon from "@material-ui/icons/Clear"
 import { getValidPaths } from "./getValidPaths.js"
 import { randomRgbStringFromSeed } from "./random.js"
+import { pathToWord } from "./generateGrid.js"
 
 export const WordInput = () => {
-    const { input, error, hint } = store.useQuery({
+    const { input, error, hintPath } = store.useQuery({
         input: true,
         error: true,
-        hint: true,
+        hintPath: true,
     })
     const inputScore = getScore(input)
     // @ts-ignore
     const analysis = store.useGet("analysis")[0]
+    const hintPrefix = pathToWord(hintPath, analysis)
+    const revertToHint = () => {
+        store.update({
+            path: hintPath,
+            input: hintPrefix,
+            errors: "",
+            isValid: true,
+        })
+    }
     return (
         <Column align="center">
             <Row justify="center">
@@ -31,20 +41,20 @@ export const WordInput = () => {
                     value={input}
                     onChange={({ target }) => {
                         const updatedInput = target.value.toLowerCase()
-                        const validatedInput = updatedInput.startsWith(hint)
-                            ? updatedInput
-                            : hint
-
-                        const { isValid, lastValidPath } = getValidPaths(
-                            validatedInput,
-                            analysis
-                        )
-                        store.update({
-                            path: lastValidPath,
-                            input: validatedInput,
-                            errors: "",
-                            isValid,
-                        })
+                        if (!updatedInput.startsWith(hintPrefix)) {
+                            revertToHint()
+                        } else {
+                            const { isValid, lastValidPath } = getValidPaths(
+                                updatedInput,
+                                analysis
+                            )
+                            store.update({
+                                path: lastValidPath,
+                                input: updatedInput,
+                                errors: "",
+                                isValid,
+                            })
+                        }
                     }}
                     kind="underlined"
                     onKeyPress={({ key }) => {
@@ -66,7 +76,7 @@ export const WordInput = () => {
                             Icon={BackIcon}
                             style={{ marginRight: 8 }}
                             onClick={() => {
-                                if (input.length > hint.length) {
+                                if (input.length > hintPath.length) {
                                     const updatedInput = input.slice(0, -1)
                                     const { isValid, lastValidPath } =
                                         getValidPaths(updatedInput, analysis)
@@ -80,21 +90,7 @@ export const WordInput = () => {
                             }}
                         />
 
-                        <Button
-                            Icon={ClearIcon}
-                            onClick={() => {
-                                const { lastValidPath } = getValidPaths(
-                                    hint,
-                                    analysis
-                                )
-                                store.update({
-                                    path: lastValidPath,
-                                    input: hint,
-                                    errors: "",
-                                    isValid: true,
-                                })
-                            }}
-                        />
+                        <Button Icon={ClearIcon} onClick={revertToHint} />
 
                         <Button
                             style={{ marginLeft: 8 }}

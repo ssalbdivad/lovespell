@@ -4,8 +4,7 @@ import { Mode, store } from "./state"
 import Slider from "@material-ui/core/Slider"
 import { RadioGroup, FormControlLabel } from "@material-ui/core"
 import { Radio } from "@material-ui/core"
-import { maxGridDimensionByMode } from "./generateGrid.js"
-import { getValidPaths } from "./getValidPaths.js"
+import { maxGridDimensionByMode, pathToWord } from "./generateGrid.js"
 
 type ActionButtonProps = {
     text: string
@@ -22,13 +21,14 @@ const ActionButton = ({ text, style, onClick }: ActionButtonProps) => (
 export type ActionsProps = {}
 
 export const Actions = ({}: ActionsProps) => {
-    const { mode, currentPangram, hint } = store.useQuery({
+    const { mode, hintPath } = store.useQuery({
         mode: true,
-        currentPangram: true,
-        hint: true,
+        hintPath: true,
     })
     // @ts-ignore
     const analysis = store.useGet("analysis")[0]
+    const pangramPath =
+        mode === "pangram" ? Object.values(analysis.solutions)[0].paths[0] : []
     return (
         <Column style={{ padding: 8 }}>
             <Row justify="center">
@@ -36,18 +36,20 @@ export const Actions = ({}: ActionsProps) => {
                     <ActionButton
                         style={{ marginRight: 8, marginLeft: 8 }}
                         onClick={() => {
-                            if (hint !== currentPangram) {
-                                const updatedHint =
-                                    hint + currentPangram[hint.length]
-                                const { lastValidPath } = getValidPaths(
-                                    updatedHint,
+                            if (hintPath.length !== pangramPath.length) {
+                                const updatedHintPath = [
+                                    ...hintPath,
+                                    pangramPath[hintPath.length],
+                                ]
+                                const hintPrefix = pathToWord(
+                                    updatedHintPath,
                                     analysis
                                 )
                                 store.update({
-                                    hint: updatedHint,
-                                    input: updatedHint,
+                                    hintPath: updatedHintPath,
+                                    input: hintPrefix,
                                     error: "",
-                                    path: lastValidPath,
+                                    path: updatedHintPath,
                                     isValid: true,
                                 })
                             }

@@ -1,7 +1,7 @@
-import { jsrx, shell } from "jsrx"
+import { jsrx, shell, $ } from "jsrx"
 import { createServer, build, UserConfig } from "vite"
 import { getWebConfig } from "@re-do/configs"
-import { fromHere } from "@re-do/node-utils"
+import { fromHere, shellAsync } from "@re-do/node-utils"
 import { cpSync, readFileSync, writeFileSync } from "fs"
 // import { buildSortedDictionary, buildWordsTrie } from "./src/dictionary"
 
@@ -18,11 +18,7 @@ const getWebsiteConfig = ({ watch = false }: GetConfigArgs = {}) =>
         watch,
         options: {
             build: {
-                target: "modules",
                 sourcemap: false,
-                terserOptions: {
-                    ecma: 2015,
-                },
             },
             server: {
                 port: Number(process.env.VITE_DEV_SERVER_PORT),
@@ -38,7 +34,7 @@ const start = async () => {
 jsrx(
     {
         dev: {
-            start,
+            start: $("vite"),
             generateSortedDictionary: async () => {
                 // writeFileSync(
                 //     fromHere("src", "sortedDictionary.json"),
@@ -55,7 +51,7 @@ jsrx(
         prod: {
             build: async () => {
                 shell("tsc --noEmit")
-                await build(getWebsiteConfig())
+                await shellAsync("vite build")
                 cpSync("CNAME", "docs/CNAME")
                 cpSync("src/assets/icon.png", "docs/assets/icon.png")
                 const indexHtmlWithRelativePaths = readFileSync(

@@ -117,8 +117,15 @@ export const generateLetterGrid = ({
             populateFreeSearchGrid(grid)
             solutions = findWords(grid)
         } else if (mode === "pangram") {
-            populatePangramGrid(grid)
-            solutions = findWords(grid)
+            const { word, path } = populatePangramGrid(grid)
+            solutions = {
+                [word]: {
+                    paths: [path],
+                    length: word.length,
+                    score: getScore(word),
+                    positionsUsed: path.length,
+                },
+            }
         } else {
             throw new Error(`Unknown mode ${mode}.`)
         }
@@ -131,6 +138,9 @@ export const generateLetterGrid = ({
     }
     return analysis
 }
+
+export const pathToWord = (path: Position[], analysis: Analysis) =>
+    path.map((position) => analysis.grid[position].value).join("")
 
 export const maxPositionsUsed = (paths: string[][]) => {
     let maxPositionsUsed = 0

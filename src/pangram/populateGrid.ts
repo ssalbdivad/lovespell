@@ -42,7 +42,11 @@ export const populatePangramGrid = (emptyGrid: Grid) => {
         return null
     }
     const pangramPath = randomValidPath(emptyGrid, word, [])
-    pangramPath?.forEach((position, index) => {
+    if (!pangramPath) {
+        throw new Error("Unable to generate a valid pangram path.")
+    }
+    pangramPath.forEach((position, index) => {
         emptyGrid[position].value = word[index]
     })
+    return { word, path: pangramPath }
 }

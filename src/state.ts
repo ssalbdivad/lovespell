@@ -41,14 +41,13 @@ export const getDefaultState = (args: GetDefaultStateArgs = {}) => {
         path: [] as Position[],
         input: "",
         error: "",
-        hint: "",
+        hintPath: [] as Position[],
         isValid: true,
         revealed: false,
         rows,
         columns,
         mode,
         pangramsFound,
-        currentPangram: "",
     }
 }
 
@@ -96,7 +95,7 @@ export const store = new Store(
                         error: "",
                         isValid: true,
                         input: "",
-                        hint: "",
+                        hint: [],
                     }
                 } else if (mode === "pangram") {
                     const positionsUsed = maxPositionsUsed([path]).count
